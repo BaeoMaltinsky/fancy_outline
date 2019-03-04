@@ -63,11 +63,12 @@ class OutlineProcessor(Treeprocessor):
     def jump(self, root):
         """Adds jump to top link at end of section with specified depth"""
         # check for <JTT> in markdown
-        if root.findall(".//JTT") == []:
+        jtt = root.find(".//JTT")
+        if jtt is None:
             return
-
-        level = self.jump['level']
-        link_text = self.jump['link_text']
+        else:
+            level = int(jtt[0].attrib["level"])
+        link_text = self.jump
 
         # get all elements with tag section and class='section(%level)'
         elements = root.findall(".//section[@class='section%d']" % level)
@@ -82,8 +83,7 @@ class OutlineProcessor(Treeprocessor):
         self.move_attrib = self.config.get('move_attrib')[0]
         self.jump = self.config.get('jump')[0]
         self.process_nodes(root)
-        if self.jump['level'] > 0:
-            self.jump(root)
+        self.jump(root)
         return root
 
 
@@ -94,8 +94,7 @@ class OutlineExtension(Extension):
             'wrapper_cls': ['section%(LEVEL)d',
                             'Default CSS class applied to sections'],
             'move_attrib': [True, 'Move header attributes to the wrapper'],
-            'jump': [{'level': 0, 'link_text': 'Jump to Top'},
-                     'level to include jump-to-top links at and text of link']
+            'jump': ['Jump to Top', 'link text for jump to top link']
         }
         super(OutlineExtension, self).__init__(**kwargs)
 
