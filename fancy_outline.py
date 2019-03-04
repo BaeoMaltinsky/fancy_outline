@@ -67,7 +67,7 @@ class OutlineProcessor(Treeprocessor):
         if jtt is None:
             return
         else:
-            level = int(jtt[0].attrib["level"])
+            level = int(jtt.attrib["level"])
         link_text = self.jump
 
         # get all elements with tag section and class='section(%level)'
