@@ -198,12 +198,21 @@ class OutlineProcessor(Treeprocessor):
                     container.append(child)
                     node.remove(child)
 
+    def jump(self, root):
+        """Adds jump to top link at end of section with specified depth"""
+        # get all elements with tag section and class='section3'
+        elements = root.findall(".//section[@class='section3']")
+        for e in elements:
+            jumper = etree.SubElement(e, "a", attrib={"class": "jump-to-top",
+                                                      "href": "#"})
+            jumper.text = "Jump to Top"
+
     def run(self, root):
         self.wrapper_tag = self.config.get('wrapper_tag')[0]
         self.wrapper_cls = self.config.get('wrapper_cls')[0]
         self.move_attrib = self.config.get('move_attrib')[0]
-
         self.process_nodes(root)
+        self.jump(root)
         return root
 
 
