@@ -60,34 +60,40 @@ class OutlineProcessor(Treeprocessor):
 
     def jump(self, root):
         """Adds jump to top link at end of section with specified depth"""
-        # defaults until I figure out how markdown extension configs work
 
         jtt = False
-        # check for JTT in markdown
-        try:
-            for e in root.findall("p"):
-                if "JTT:" in e.text:
-                    jtt = True
-                    options_str = e.text.split("JTT:")[1]
-                    options = json.loads(options_str)
-                    link_text = options.get("link_text")
-                    level = int(options.get("level"))
-                    print(level, link_text)
-                    root.remove(e)
-                    break
-        except Exception:
-            return
 
+        # regex pattern for marker
+        pattern = re.compile(r'(\[JTT\]\s*)({.*})?')
+
+        # check for JTT in markdown
+        for e in root.findall("p"):
+            if e.text is None:
+                continue
+            marker = pattern.search(e.text)
+            if marker is not None:
+                jtt = True
+                if marker.group(2) is None:
+                    level = None
+                    link_text = None
+                    break
+                options = json.loads(marker.group(2))
+                link_text = options.get("link_text")
+                level = int(options.get("level"))
+                root.remove(e)
+                break
+
+        # return if no marker
         if not(jtt):
             return
 
+        # defaults until I figure out how markdown extension configs work
         if level is None:
             level = 1
-
         if link_text is None:
             link_text = "Jump to Top"
 
-        # get all elements with tag section and class='section%s' level
+        # get all elements with tag section and class='section%d' level
         elements = root.findall(".//section[@class='section%d']" % level)
         for e in elements:
             jumper = etree.SubElement(e, "a", attrib={"class": "jump-to-top",
