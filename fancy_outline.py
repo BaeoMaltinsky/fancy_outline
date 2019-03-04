@@ -1,10 +1,8 @@
 import re
+import json
 from markdown.util import etree
 from markdown import Extension
 from markdown.treeprocessors import Treeprocessor
-
-
-__version__ = "1.3.0"
 
 
 class OutlineProcessor(Treeprocessor):
@@ -62,25 +60,40 @@ class OutlineProcessor(Treeprocessor):
 
     def jump(self, root):
         """Adds jump to top link at end of section with specified depth"""
-        # check for <JTT/> in markdown
-        jtt = root.find(".//JTT")
-        if jtt is None:
-            return
-        else:
-            level = jtt.get("level")
-            link_text = jtt.get("text")
         # defaults until I figure out how markdown extension configs work
+
+        jtt = False
+        # check for JTT in markdown
+        try:
+            for e in root.findall("p"):
+                if "JTT:" in e.text:
+                    jtt = True
+                    options_str = e.text.split("JTT:")[1]
+                    options = json.loads(options_str)
+                    link_text = options.get("link_text")
+                    level = int(options.get("level"))
+                    print(level, link_text)
+                    root.remove(e)
+                    break
+        except Exception:
+            return
+
+        if not(jtt):
+            return
+
+        if level is None:
+            level = 1
+
         if link_text is None:
             link_text = "Jump to Top"
-        if level is None:
-            level = "1"
 
         # get all elements with tag section and class='section%s' level
-        elements = root.findall(".//section[@class='section%s']" % level)
+        elements = root.findall(".//section[@class='section%d']" % level)
         for e in elements:
             jumper = etree.SubElement(e, "a", attrib={"class": "jump-to-top",
                                                       "href": "#"})
             jumper.text = link_text
+        return root
 
     def run(self, root):
         self.wrapper_tag = self.config.get('wrapper_tag')[0]
