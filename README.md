@@ -31,7 +31,7 @@ You can change the section level the link appears at and the link text with the 
 [JTT] {"level": 3, "link_text": "Help! There are too many words here!"}
 ```
 
-*Because everything is better with JSON!* This inserts the following at the end of `<section class="section3">` elements:
+*Because everything is better with JSON!*  This inserts the following at the end of `<section class="section3">` elements:
 
 ```
 <a class="jump-to-top" href="#">Help! There are too many words here!</a>
