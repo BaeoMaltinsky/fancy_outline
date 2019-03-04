@@ -4,9 +4,6 @@ from markdown import Extension
 from markdown.treeprocessors import Treeprocessor
 
 
-__version__ = "0.1"
-
-
 class OutlineProcessor(Treeprocessor):
     def process_nodes(self, node):
         s = []
@@ -67,11 +64,11 @@ class OutlineProcessor(Treeprocessor):
         if jtt is None:
             return
         else:
-            level = int(jtt.attrib["level"])
+            level = jtt.attrib["level"]
         link_text = self.jump
 
         # get all elements with tag section and class='section(%level)'
-        elements = root.findall(".//section[@class='section%d']" % level)
+        elements = root.findall(".//section[@class='section%s']" % level)
         for e in elements:
             jumper = etree.SubElement(e, "a", attrib={"class": "jump-to-top",
                                                       "href": "#"})
