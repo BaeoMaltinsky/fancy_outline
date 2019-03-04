@@ -4,6 +4,9 @@ from markdown import Extension
 from markdown.treeprocessors import Treeprocessor
 
 
+__version__ = "1.3.0"
+
+
 class OutlineProcessor(Treeprocessor):
     def process_nodes(self, node):
         s = []
@@ -59,15 +62,20 @@ class OutlineProcessor(Treeprocessor):
 
     def jump(self, root):
         """Adds jump to top link at end of section with specified depth"""
-        # check for <JTT> in markdown
+        # check for <JTT/> in markdown
         jtt = root.find(".//JTT")
         if jtt is None:
             return
         else:
-            level = jtt.attrib["level"]
-        link_text = self.jump
+            level = jtt.get("level")
+            link_text = jtt.get("text")
+        # defaults until I figure out how markdown extension configs work
+        if link_text is None:
+            link_text = "Jump to Top"
+        if level is None:
+            level = "1"
 
-        # get all elements with tag section and class='section(%level)'
+        # get all elements with tag section and class='section%s' level
         elements = root.findall(".//section[@class='section%s']" % level)
         for e in elements:
             jumper = etree.SubElement(e, "a", attrib={"class": "jump-to-top",
@@ -78,7 +86,6 @@ class OutlineProcessor(Treeprocessor):
         self.wrapper_tag = self.config.get('wrapper_tag')[0]
         self.wrapper_cls = self.config.get('wrapper_cls')[0]
         self.move_attrib = self.config.get('move_attrib')[0]
-        self.jump = self.config.get('jump')[0]
         self.process_nodes(root)
         self.jump(root)
         return root
@@ -88,10 +95,8 @@ class OutlineExtension(Extension):
     def __init__(self, *args, **kwargs):
         self.config = {
             'wrapper_tag': ['section', 'Tag name to use, default: section'],
-            'wrapper_cls': ['section%(LEVEL)d',
-                            'Default CSS class applied to sections'],
-            'move_attrib': [True, 'Move header attributes to the wrapper'],
-            'jump': ['Jump to Top', 'link text for jump to top link']
+            'wrapper_cls': ['section%(LEVEL)d', 'Default CSS class applied to sections'],
+            'move_attrib': [True, 'Move header attributes to the wrapper']
         }
         super(OutlineExtension, self).__init__(**kwargs)
 

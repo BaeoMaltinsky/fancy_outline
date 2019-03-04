@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='fancy_outline',
-    version='0.1.1',
+    version='0.1',
     author='Baeo Maltinsky',
     author_email='baeomaltinsky@gmail.com',
     description='mdx_outline with optional "Jump to Top" links',
