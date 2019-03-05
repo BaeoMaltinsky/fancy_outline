@@ -19,7 +19,7 @@ To use this extension, place the following marker somewhere in the markdown:
 
 which inserts the following at the end of `<section class="section1">` elements:
 
-```
+```html
 <a class="jump-to-top" href="#">Jump to Top</a>
 ```
 
@@ -35,7 +35,7 @@ You can change the section level the link appears at and the link text with the 
 
 This inserts the following at the end of `<section class="section3">` elements:
 
-```
+```html
 <a class="jump-to-top" href="#">Help! There are too many words here!</a>
 ```
 
